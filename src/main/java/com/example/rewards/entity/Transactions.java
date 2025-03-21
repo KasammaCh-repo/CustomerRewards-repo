@@ -1,7 +1,9 @@
 package com.example.rewards.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Date;
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table
+@NoArgsConstructor
+@AllArgsConstructor
 public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

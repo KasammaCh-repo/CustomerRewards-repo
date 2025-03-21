@@ -1,20 +1,19 @@
 package com.example.rewards.controller;
 
 import com.example.rewards.dto.CustomerRewards;
-import com.example.rewards.service.RewardsService;
+import com.example.rewards.service.CustomerRewardsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/rewards")
-public class RewardsController {
+public class CustomerRewardsController {
 
     @Autowired
-    private RewardsService rewardsService;
+    private CustomerRewardsService rewardsService;
 
     @GetMapping("/getRewardPoints/{customerId}")
     public CustomerRewards getCustomerRewards(@PathVariable String customerId,

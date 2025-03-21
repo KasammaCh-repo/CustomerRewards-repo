@@ -3,6 +3,7 @@ package com.example.rewards.service;
 import com.example.rewards.dto.CustomerRewards;
 import com.example.rewards.entity.Transactions;
 import com.example.rewards.repository.TransactionsRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
@@ -13,7 +14,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class RewardsService {
+@AllArgsConstructor
+public class CustomerRewardsService {
 
     @Autowired
     private TransactionsRepository transactionsRepository;
