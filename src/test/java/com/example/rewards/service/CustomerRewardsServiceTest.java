@@ -2,6 +2,8 @@ package com.example.rewards.service;
 
 import com.example.rewards.dto.CustomerRewards;
 import com.example.rewards.entity.Transactions;
+import com.example.rewards.exception.CustomerNotFoundException;
+import com.example.rewards.exception.InvalidDateRangeException;
 import com.example.rewards.repository.TransactionsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,17 +11,20 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 public class CustomerRewardsServiceTest {
 
+    @Mock
+    private TransactionsRepository transactionsRepository;
     @Mock
     private CustomerRewardsService rewardsService;
 
@@ -28,7 +33,7 @@ public class CustomerRewardsServiceTest {
         MockitoAnnotations.openMocks(this);
     }
     @Test
-    public void testGetCustomerRewards() {
+    public void testGetCustomerRewards() throws CustomerNotFoundException, InvalidDateRangeException {
         TransactionsRepository transactionsRepository = Mockito.mock(TransactionsRepository.class);
         CustomerRewardsService service = new CustomerRewardsService(transactionsRepository);
         String customerId = "10001";
@@ -41,8 +46,8 @@ public class CustomerRewardsServiceTest {
         Mockito.when(transactionsRepository.findByCustomerIdAndDateBetween(customerId, "2023-01-01", "2023-03-31"))
                 .thenReturn(transactions);
         Map<String, Integer> mockMonthlyPoints = new HashMap<>();
-        mockMonthlyPoints.put("1", 150);
-        mockMonthlyPoints.put("3",250);
+        mockMonthlyPoints.put("JANUARY", 150);
+        mockMonthlyPoints.put("MARCH",250);
         Mockito.doReturn(mockMonthlyPoints).when(rewardsService).getMonthlyPoints(Mockito.anyList());
         Mockito.doReturn(50).when(rewardsService).calculatePoints((double) Mockito.anyInt());
         CustomerRewards rewards = service.getCustomerRewards(customerId, startDate, endDate);
@@ -51,6 +56,34 @@ public class CustomerRewardsServiceTest {
         assertEquals(400, rewards.getTotalPoints());
         assertEquals(mockMonthlyPoints, rewards.getMonthlyPoints());
         assertEquals(transactions, rewards.getTransactionsList());
+    }
+
+    @Test
+    public void testGetCustomerRewards_EmptyTransactionList() {
+        TransactionsRepository transactionsRepository = Mockito.mock(TransactionsRepository.class);
+        CustomerRewardsService service = new CustomerRewardsService(transactionsRepository);
+        String customerId = "67890";
+        LocalDate startDate = LocalDate.of(2023, 1, 1);
+        LocalDate endDate = LocalDate.of(2023, 1, 31);
+
+        Mockito.when(transactionsRepository.findByCustomerIdAndDateBetween(customerId, "2023-01-01", "2023-01-31"))
+                .thenReturn(Collections.emptyList());
+        assertThrows(CustomerNotFoundException.class, () ->
+                service.getCustomerRewards(customerId, startDate, endDate)
+        );
+    }
+
+    @Test
+    public void testGetCustomerRewards_InvalidDateRange() {
+        TransactionsRepository transactionsRepository = Mockito.mock(TransactionsRepository.class);
+        CustomerRewardsService service = new CustomerRewardsService(transactionsRepository);
+        String customerId = "12345";
+        LocalDate startDate = LocalDate.of(2023, 4, 1);
+        LocalDate endDate = LocalDate.of(2023, 1, 31);
+
+        assertThrows(InvalidDateRangeException.class, () ->
+                service.getCustomerRewards(customerId, startDate, endDate)
+        );
     }
 
 }

@@ -2,19 +2,22 @@ package com.example.rewards.service;
 
 import com.example.rewards.dto.CustomerRewards;
 import com.example.rewards.entity.Transactions;
+import com.example.rewards.exception.CustomerNotFoundException;
+import com.example.rewards.exception.InvalidDateRangeException;
 import com.example.rewards.repository.TransactionsRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CustomerRewardsService {
 
     @Autowired
@@ -32,11 +35,21 @@ public class CustomerRewardsService {
         return points;
     }
 
-    public CustomerRewards getCustomerRewards(String customerId, LocalDate startDate, LocalDate endDate) {
+    public CustomerRewards getCustomerRewards(String customerId, LocalDate startDate, LocalDate endDate) throws CustomerNotFoundException, InvalidDateRangeException {
+        log.info("Calculating reward points for Customer:{} ", customerId);
         CustomerRewards customerRewards = new CustomerRewards();
+        if(startDate.isAfter(endDate)) {
+            throw new InvalidDateRangeException("Start date must be before end date");
+        }
         List<Transactions> transactionsList = transactionsRepository.findByCustomerIdAndDateBetween(customerId, startDate.toString(), endDate.toString());
+        if(transactionsList.isEmpty()) {
+            throw new CustomerNotFoundException("Customer not found: " +customerId);
+        }
         Map<String, Integer> monthlyPoints = getMonthlyPoints(transactionsList);
-        int totalPoints = transactionsList.stream().mapToInt(t -> calculatePoints(t.getAmount())).sum();
+        // calculating total points for the given time frame
+        int totalPoints = transactionsList.stream()
+                .mapToInt(t -> calculatePoints(t.getAmount())).sum();
+        log.info("Total points calculated:{}", totalPoints);
         customerRewards.setCustomerId(customerId);
         customerRewards.setTotalPoints(totalPoints);
         customerRewards.setMonthlyPoints(monthlyPoints);
@@ -45,17 +58,15 @@ public class CustomerRewardsService {
     }
 
     public Map<String, Integer> getMonthlyPoints(List<Transactions> transactionsList){
-        Function<Transactions, String> monthValue = t -> String.valueOf(t.getDate().getMonthValue());
-        Map<String, List<Transactions>> groupedByMonth = transactionsList.stream()
-                .collect(Collectors.groupingBy(monthValue));
+        // Create a HashMap to store monthly points
         Map<String, Integer> monthlyPoints = new HashMap<>();
-        for(Map.Entry<String, List<Transactions>> entry : groupedByMonth.entrySet()){
-            String month = entry.getKey();
-            List<Transactions> monthlyTransactions = entry.getValue();
-            int monthTotalPoints = monthlyTransactions.stream()
-                    .mapToInt(t -> calculatePoints(t.getAmount())).sum();
-            monthlyPoints.put(month, monthTotalPoints);
-        }
+        // Group transactions by month and calculate points for each month
+        transactionsList.stream()
+                .collect(Collectors.groupingBy(
+                        t -> t.getDate().getMonth().toString(),
+                        Collectors.summingInt(t -> calculatePoints(t.getAmount()))
+                )).forEach(monthlyPoints::put);
+        log.info("Monthly points calculated:{}", monthlyPoints);
         return monthlyPoints;
     }
 }

@@ -1,3 +1,3 @@
-Sample Request and Response for testing the Api
+Testing the Api in postman
 
-![img.png](img.png)
+![img_1.png](img_1.png)
