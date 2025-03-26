@@ -31,42 +31,8 @@ Parameters:
 
 Response:
 
-{
-"customerId": "10001",
-"totalPoints": 4200,
-"monthlyPoints": {
-"MARCH": 850,
-"FEBRUARY": 1850,
-"APRIL": 1500
-},
-"transactionsList": [
-{
-"id": 1,
-"customerId": "10001",
-"amount": 1000.0,
-"date": "2025-02-21"
-},
-{
-"id": 2,
-"customerId": "10001",
-"amount": 500.0,
-"date": "2025-03-21"
-},
-{
-"id": 3,
-"customerId": "10001",
-"amount": 700.0,
-"date": "2025-04-21"
-},
-{
-"id": 4,
-"customerId": "10001",
-"amount": 200.0,
-"date": "2025-04-15"
-}
-]
-}
-
+`{"customerId":"10001","totalPoints":4200,"monthlyPoints":[{"transactionMonth":"MARCH","rewardPoints":850},{"transactionMonth":"FEBRUARY","rewardPoints":1850},{"transactionMonth":"APRIL","rewardPoints":1500}],"transactionsList":[{"id":1,"customerId":"10001","amount":1000.0,"date":"2025-02-21"},{"id":2,"customerId":"10001","amount":500.0,"date":"2025-03-21"},{"id":3,"customerId":"10001","amount":700.0,"date":"2025-04-21"},{"id":4,"customerId":"10001","amount":200.0,"date":"2025-04-15"}]}
+`
 Exception Handling:
 
 This application has custom exception handling for the following scenarios
