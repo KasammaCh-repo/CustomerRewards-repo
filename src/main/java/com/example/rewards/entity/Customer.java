@@ -15,8 +15,4 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private String name;
-
-    /*@OneToMany(mappedBy = "customerId")
-    private List<Transactions> transactionsList;
-*/
 }

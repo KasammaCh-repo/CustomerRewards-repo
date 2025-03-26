@@ -52,10 +52,6 @@ public class CustomerRewardsService {
         for(Map.Entry<String, List<Transactions>> entry : groupedByMonth.entrySet()){
             String month = entry.getKey();
             List<Transactions> monthlyTransactions = entry.getValue();
-
-
-
-
             int monthTotalPoints = monthlyTransactions.stream()
                     .mapToInt(t -> calculatePoints(t.getAmount())).sum();
             monthlyPoints.put(month, monthTotalPoints);

@@ -11,8 +11,8 @@
 	<groupId>com.example</groupId>
 	<artifactId>Rewards</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Rewards</name>
-	<description> Spring Boot project for Calculating customer rewards based on their transactions made in 3 months</description>
+	<name>CustomerRewards</name>
+	<description>CustomerRewards</description>
 	<url/>
 	<licenses>
 		<license/>
