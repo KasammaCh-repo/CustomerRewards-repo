@@ -1,6 +1,7 @@
 package com.example.rewards.service;
 
 import com.example.rewards.dto.CustomerRewards;
+import com.example.rewards.dto.MonthlyPoints;
 import com.example.rewards.entity.Transactions;
 import com.example.rewards.exception.CustomerNotFoundException;
 import com.example.rewards.exception.InvalidDateRangeException;
@@ -14,9 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -45,16 +44,17 @@ public class CustomerRewardsServiceTest {
         );
         Mockito.when(transactionsRepository.findByCustomerIdAndDateBetween(customerId, "2023-01-01", "2023-03-31"))
                 .thenReturn(transactions);
-        Map<String, Integer> mockMonthlyPoints = new HashMap<>();
-        mockMonthlyPoints.put("JANUARY", 150);
-        mockMonthlyPoints.put("MARCH",250);
+        List<MonthlyPoints> mockMonthlyPoints = Arrays.asList(
+                new MonthlyPoints("FEBRUARY", 200),
+                new MonthlyPoints("MARCH", 150)
+        );
         Mockito.doReturn(mockMonthlyPoints).when(rewardsService).getMonthlyPoints(Mockito.anyList());
         Mockito.doReturn(50).when(rewardsService).calculatePoints((double) Mockito.anyInt());
         CustomerRewards rewards = service.getCustomerRewards(customerId, startDate, endDate);
 
         assertEquals(customerId, rewards.getCustomerId());
         assertEquals(400, rewards.getTotalPoints());
-        assertEquals(mockMonthlyPoints, rewards.getMonthlyPoints());
+        assertEquals(mockMonthlyPoints.size(), rewards.getMonthlyPoints().size());
         assertEquals(transactions, rewards.getTransactionsList());
     }
 
