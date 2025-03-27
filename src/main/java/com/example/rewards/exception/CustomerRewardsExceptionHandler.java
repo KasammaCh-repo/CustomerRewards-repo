@@ -12,6 +12,7 @@ public class CustomerRewardsExceptionHandler {
     public ResponseEntity<String> handleCustomerNotFoundException(CustomerNotFoundException customerNotFoundException){
         return new ResponseEntity<>(customerNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
+
     @ExceptionHandler(InvalidDateRangeException.class)
     public ResponseEntity<String> handleInvalidDateRangeException(InvalidDateRangeException invalidDateRangeException){
         return new ResponseEntity<>(invalidDateRangeException.getMessage(), HttpStatus.BAD_REQUEST);
