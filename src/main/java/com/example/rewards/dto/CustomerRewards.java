@@ -16,6 +16,6 @@ import java.util.Map;
 public class CustomerRewards {
     private String customerId;
     private Integer totalPoints;
-    private Map<String, Integer> monthlyPoints;
+    private List<MonthlyPoints> monthlyPoints;
     private List<Transactions> transactionsList;
 }

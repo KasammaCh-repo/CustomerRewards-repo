@@ -37,7 +37,7 @@ Exception Handling:
 
 This application has custom exception handling for the following scenarios
 * CustomerNotFoundException : Throws when the given customer not found
-* InvalidDaterangeException: throws when the start date is after the end date
+* InvalidDateRangeException: throws when the start date is after the end date
 
 Logging:
 Application used SLF4J for logging important actions and errors.

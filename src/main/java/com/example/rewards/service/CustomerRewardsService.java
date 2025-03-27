@@ -1,6 +1,7 @@
 package com.example.rewards.service;
 
 import com.example.rewards.dto.CustomerRewards;
+import com.example.rewards.dto.MonthlyPoints;
 import com.example.rewards.entity.Transactions;
 import com.example.rewards.exception.CustomerNotFoundException;
 import com.example.rewards.exception.InvalidDateRangeException;
@@ -45,7 +46,7 @@ public class CustomerRewardsService {
         if(transactionsList.isEmpty()) {
             throw new CustomerNotFoundException("Customer not found: " +customerId);
         }
-        Map<String, Integer> monthlyPoints = getMonthlyPoints(transactionsList);
+        List<MonthlyPoints> monthlyPoints = getMonthlyPoints(transactionsList);
         // calculating total points for the given time frame
         int totalPoints = transactionsList.stream()
                 .mapToInt(t -> calculatePoints(t.getAmount())).sum();
@@ -57,15 +58,17 @@ public class CustomerRewardsService {
         return customerRewards;
     }
 
-    public Map<String, Integer> getMonthlyPoints(List<Transactions> transactionsList){
-        // Create a HashMap to store monthly points
-        Map<String, Integer> monthlyPoints = new HashMap<>();
+    public List<MonthlyPoints> getMonthlyPoints(List<Transactions> transactionsList){
+        Map<String, Integer> monthlyPointsMap = new HashMap<>();
         // Group transactions by month and calculate points for each month
         transactionsList.stream()
                 .collect(Collectors.groupingBy(
                         t -> t.getDate().getMonth().toString(),
                         Collectors.summingInt(t -> calculatePoints(t.getAmount()))
-                )).forEach(monthlyPoints::put);
+                )).forEach(monthlyPointsMap::put);
+        List<MonthlyPoints> monthlyPoints = monthlyPointsMap.entrySet().stream()
+                        .map(entry -> new MonthlyPoints(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList());
         log.info("Monthly points calculated:{}", monthlyPoints);
         return monthlyPoints;
     }
